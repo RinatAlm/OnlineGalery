@@ -20,21 +20,24 @@ public class GaleryManager : MonoBehaviour
     public Scrollbar verticalScrollBar;
     private int offset = 8;
     public bool isRunning = false;
+    public Sprite defaultSprite;
+    public int startingPoint;
+    public int finishingPoint;
 
-    [Header("Check")]
-    public GameObject checkPanel;
-    public Text isRunningText;
-    public Text urlToLoadText;
-    public Text listenerBarText;
-    public Text counterText;
-    public Text barValueText;
+
+    //[Header("Check")]
+    //public GameObject checkPanel;
+    //public Text isRunningText;
+    //public Text urlToLoadText;
+    //public Text listenerBarText;
+    //public Text counterText;
+    //public Text barValueText;
 
     private void Start()
-    {
-    
+    {  
         Screen.orientation = ScreenOrientation.Portrait;
-       // loadingScreen.SetActive(true);
-        //StartCoroutine(LoadingScreen());
+        loadingScreen.SetActive(true);
+        StartCoroutine(LoadingScreen());
         imagesTotalNum--;
         for (int i = 0; i <= imagesTotalNum; i++)//Createing 66 empty spaces for images in scroll view
         {
@@ -50,11 +53,11 @@ public class GaleryManager : MonoBehaviour
 
     void Update()
     {
-        isRunningText.text = "isRunning : " + isRunning.ToString();
-        urlToLoadText.text = "urlCount : " + urlIndexToLoad.Count.ToString();
-        listenerBarText.text = verticalScrollBar.onValueChanged.GetPersistentMethodName(0).ToString();
-        counterText.text = counter.ToString();
-        barValueText.text = verticalScrollBar.value.ToString();
+        //isRunningText.text = "isRunning : " + isRunning.ToString();
+        //urlToLoadText.text = "urlCount : " + urlIndexToLoad.Count.ToString();
+        //listenerBarText.text = verticalScrollBar.onValueChanged.GetPersistentMethodName(0).ToString();
+        //counterText.text = counter.ToString();
+        //barValueText.text = verticalScrollBar.value.ToString();
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -98,6 +101,7 @@ public class GaleryManager : MonoBehaviour
     private void CreateImage()
     {
         GameObject imageGameobject = Instantiate(imagePrefab, scrollViewContainer);
+        
         images.Add(imageGameobject.transform.Find("OnlineImage").GetComponent<Image>());
     }
 
@@ -125,11 +129,41 @@ public class GaleryManager : MonoBehaviour
         counter += offset;
         if (counter > imagesTotalNum)
             return;
-        if (!urlIndexToLoad.Contains(counter))
+        if (!urlIndexToLoad.Contains(counter) && images[counter].sprite == defaultSprite)
             urlIndexToLoad.Add(counter);
         StartLoadingCoroutine();
     }
 
+    public void SetStartingPoint()
+    {
+        startingPoint = (int)(imagesTotalNum - (imagesTotalNum * verticalScrollBar.value));
+    }
+
+    public void SetFinishPoint()
+    {
+        finishingPoint = (int)(imagesTotalNum - (imagesTotalNum * verticalScrollBar.value));
+        CalculateMissingSprites();
+    }
+
+    private void CalculateMissingSprites()
+    {
+        int step = finishingPoint - startingPoint;       
+        if(step<0)
+        {
+            (startingPoint, finishingPoint) = (finishingPoint, startingPoint);
+        }
+        else if (step == 0)
+        {
+            return;
+        }
+       
+        for(int i = startingPoint;i<finishingPoint;i++)
+        {
+            if (!urlIndexToLoad.Contains(i) && images[i].sprite == defaultSprite)
+                urlIndexToLoad.Add(i);           
+        }
+        StartLoadingCoroutine();
+    }
 
     public void StartLoadingCoroutine()
     {
@@ -140,9 +174,9 @@ public class GaleryManager : MonoBehaviour
 
     }
 
-    public void CheckPanel()
-    {
-        checkPanel.SetActive(!checkPanel.activeSelf);
-    }
+    //public void CheckPanel()
+    //{
+    //    checkPanel.SetActive(!checkPanel.activeSelf);
+    //}
 
 }

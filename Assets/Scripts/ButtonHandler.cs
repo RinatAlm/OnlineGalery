@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class ButtonHandler : MonoBehaviour
 {
-
+    public Sprite defaultSprite;
     void Start()
     {
         GetComponent<Button>().onClick.AddListener(PassImage);
@@ -15,7 +15,7 @@ public class ButtonHandler : MonoBehaviour
     void PassImage()
     {
         Image img = GetComponent<Image>();
-        if(!img.sprite.Equals(null))
+        if(!img.sprite.Equals(defaultSprite))
         {
             ImagePasser.instance.spriteToShow = img.sprite;
             SceneManager.LoadScene("OverviewScene");
